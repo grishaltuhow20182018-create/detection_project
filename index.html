@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Dual Model Detection</title>
+	<style>
+		:root {
+			color-scheme: dark;
+			--bg: #08111f;
+			--panel: rgba(11, 18, 32, 0.86);
+			--panel-strong: #101a2f;
+			--text: #eef3ff;
+			--muted: #9ba8c7;
+			--accent: #37d7b2;
+			--accent-2: #7da8ff;
+			--border: rgba(145, 170, 220, 0.18);
+			--shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			background:
+				radial-gradient(circle at top left, rgba(55, 215, 178, 0.22), transparent 32%),
+				radial-gradient(circle at 85% 10%, rgba(125, 168, 255, 0.2), transparent 26%),
+				linear-gradient(135deg, #06101b 0%, #0b1424 42%, #060b14 100%);
+			color: var(--text);
+			min-height: 100vh;
+		}
+
+		.shell {
+			max-width: 1180px;
+			margin: 0 auto;
+			padding: 40px 20px 56px;
+		}
+
+		.hero {
+			display: grid;
+			grid-template-columns: 1.15fr 0.85fr;
+			gap: 24px;
+			align-items: stretch;
+		}
+
+		.card {
+			background: var(--panel);
+			border: 1px solid var(--border);
+			border-radius: 24px;
+			box-shadow: var(--shadow);
+			backdrop-filter: blur(18px);
+		}
+
+		.intro {
+			padding: 30px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.intro::after {
+			content: "";
+			position: absolute;
+			inset: auto -40px -80px auto;
+			width: 220px;
+			height: 220px;
+			background: radial-gradient(circle, rgba(55, 215, 178, 0.36), transparent 70%);
+			pointer-events: none;
+		}
+
+		.eyebrow {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 8px 12px;
+			border-radius: 999px;
+			background: rgba(55, 215, 178, 0.12);
+			color: var(--accent);
+			font-size: 12px;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			margin-bottom: 18px;
+		}
+
+		h1 {
+			font-size: clamp(36px, 6vw, 64px);
+			line-height: 0.96;
+			margin: 0 0 16px;
+			letter-spacing: -0.05em;
+			max-width: 9ch;
+		}
+
+		.lead {
+			margin: 0;
+			max-width: 62ch;
+			color: var(--muted);
+			font-size: 17px;
+			line-height: 1.7;
+		}
+
+		.stats {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 12px;
+			margin-top: 28px;
+		}
+
+		.stat {
+			background: rgba(255, 255, 255, 0.03);
+			border: 1px solid rgba(255, 255, 255, 0.05);
+			border-radius: 18px;
+			padding: 14px 16px;
+		}
+
+		.stat span {
+			display: block;
+			color: var(--muted);
+			font-size: 12px;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			margin-bottom: 8px;
+		}
+
+		.stat strong {
+			font-size: 18px;
+		}
+
+		.form-card {
+			padding: 24px;
+		}
+
+		.form-grid {
+			display: grid;
+			gap: 16px;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 8px;
+			font-size: 14px;
+			color: #dbe4ff;
+		}
+
+		textarea, input[type="file"], input[type="range"] {
+			width: 100%;
+		}
+
+		textarea {
+			min-height: 120px;
+			resize: vertical;
+			border-radius: 16px;
+			border: 1px solid var(--border);
+			background: rgba(255, 255, 255, 0.04);
+			color: var(--text);
+			padding: 14px 16px;
+			font: inherit;
+			outline: none;
+		}
+
+		textarea:focus, input[type="file"]:focus {
+			border-color: rgba(55, 215, 178, 0.5);
+			box-shadow: 0 0 0 4px rgba(55, 215, 178, 0.12);
+		}
+
+		.row {
+			display: grid;
+			grid-template-columns: 1fr 160px;
+			gap: 14px;
+			align-items: end;
+		}
+
+		.range-wrap {
+			padding: 14px 16px;
+			border-radius: 16px;
+			border: 1px solid var(--border);
+			background: rgba(255, 255, 255, 0.04);
+		}
+
+		.range-head {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 10px;
+			color: var(--muted);
+			font-size: 13px;
+		}
+
+		input[type="range"] {
+			accent-color: var(--accent);
+		}
+
+		.actions {
+			display: flex;
+			gap: 12px;
+			flex-wrap: wrap;
+			margin-top: 4px;
+		}
+
+		button {
+			border: 0;
+			border-radius: 14px;
+			padding: 13px 18px;
+			font: inherit;
+			font-weight: 700;
+			cursor: pointer;
+		}
+
+		.primary {
+			background: linear-gradient(135deg, var(--accent), #61f0cf);
+			color: #041018;
+			min-width: 170px;
+		}
+
+		.secondary {
+			background: rgba(255, 255, 255, 0.06);
+			color: var(--text);
+			border: 1px solid var(--border);
+		}
+
+		.result-card {
+			margin-top: 24px;
+			padding: 24px;
+			display: grid;
+			gap: 18px;
+		}
+
+		.badge {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			width: fit-content;
+			padding: 8px 12px;
+			border-radius: 999px;
+			background: rgba(125, 168, 255, 0.12);
+			color: #dce7ff;
+			font-size: 13px;
+			border: 1px solid rgba(125, 168, 255, 0.18);
+		}
+
+		.result-meta {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 12px;
+		}
+
+		.meta-box {
+			background: rgba(255, 255, 255, 0.04);
+			border: 1px solid rgba(255, 255, 255, 0.06);
+			border-radius: 16px;
+			padding: 14px;
+		}
+
+		.meta-box span {
+			display: block;
+			font-size: 12px;
+			color: var(--muted);
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			margin-bottom: 6px;
+		}
+
+		.meta-box strong {
+			font-size: 16px;
+		}
+
+		.preview {
+			width: 100%;
+			border-radius: 18px;
+			border: 1px solid var(--border);
+			background: #03070d;
+			min-height: 280px;
+			display: grid;
+			place-items: center;
+			overflow: hidden;
+		}
+
+		.preview img {
+			max-width: 100%;
+			display: none;
+		}
+
+		.empty {
+			color: var(--muted);
+			padding: 24px;
+			text-align: center;
+		}
+
+		.detections {
+			display: grid;
+			gap: 10px;
+		}
+
+		.detection {
+			display: flex;
+			justify-content: space-between;
+			gap: 12px;
+			padding: 12px 14px;
+			border-radius: 14px;
+			background: rgba(255, 255, 255, 0.04);
+			border: 1px solid rgba(255, 255, 255, 0.06);
+			color: var(--text);
+			font-size: 14px;
+		}
+
+		.error {
+			color: #ffb4b4;
+			background: rgba(255, 120, 120, 0.08);
+			border: 1px solid rgba(255, 120, 120, 0.18);
+			padding: 12px 14px;
+			border-radius: 14px;
+			display: none;
+		}
+
+		@media (max-width: 920px) {
+			.hero,
+			.row,
+			.result-meta,
+			.stats {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main class="shell">
+		<section class="hero">
+			<div class="card intro">
+				<div class="eyebrow">Dual-model detection</div>
+				<h1>Fast speed when the scene is easy, stronger accuracy when it is not.</h1>
+				<p class="lead">
+					Upload an image, add a short request, and the server will pick the right model.
+					It uses the fast model for clear and simple cases, and the thinking model when you ask for maximum quality or the image looks harder to read.
+				</p>
+
+				<div class="stats">
+					<div class="stat"><span>Fast Model</span><strong>Quick response</strong></div>
+					<div class="stat"><span>Thinking Model</span><strong>Higher accuracy</strong></div>
+					<div class="stat"><span>Output</span><strong>Annotated image + detections</strong></div>
+				</div>
+			</div>
+
+			<div class="card form-card">
+				<form id="detect-form" class="form-grid">
+					<div>
+						<label for="request_text">Your request</label>
+						<textarea id="request_text" name="request_text" placeholder="Example: use maximum quality, image is blurry, detect everything"></textarea>
+					</div>
+
+					<div>
+						<label for="image">Upload image</label>
+						<input id="image" name="image" type="file" accept="image/*" required>
+					</div>
+
+					<div class="row">
+						<div class="range-wrap">
+							<div class="range-head">
+								<span>Confidence threshold</span>
+								<strong id="confidence-value">0.25</strong>
+							</div>
+							<input id="confidence" name="confidence" type="range" min="0.05" max="0.9" step="0.05" value="0.25">
+						</div>
+
+						<div class="actions">
+							<button class="primary" type="submit">Analyze image</button>
+							<button class="secondary" type="reset">Clear</button>
+						</div>
+					</div>
+
+					<div id="error" class="error"></div>
+				</form>
+			</div>
+		</section>
+
+		<section id="result" class="card result-card" aria-live="polite" style="display:none;">
+			<div class="badge" id="model-badge"></div>
+			<div class="result-meta">
+				<div class="meta-box"><span>Choice reason</span><strong id="reason"></strong></div>
+				<div class="meta-box"><span>Detections</span><strong id="count"></strong></div>
+				<div class="meta-box"><span>Confidence</span><strong id="conf"></strong></div>
+			</div>
+
+			<div class="preview">
+				<img id="output-image" alt="Annotated detection result">
+				<div id="empty-preview" class="empty">Your annotated result will appear here.</div>
+			</div>
+
+			<div>
+				<label>Detected objects</label>
+				<div id="detections" class="detections"></div>
+			</div>
+		</section>
+	</main>
+
+	<script>
+		const form = document.getElementById('detect-form');
+		const confidence = document.getElementById('confidence');
+		const confidenceValue = document.getElementById('confidence-value');
+		const errorBox = document.getElementById('error');
+		const result = document.getElementById('result');
+		const modelBadge = document.getElementById('model-badge');
+		const reason = document.getElementById('reason');
+		const count = document.getElementById('count');
+		const conf = document.getElementById('conf');
+		const detections = document.getElementById('detections');
+		const outputImage = document.getElementById('output-image');
+		const emptyPreview = document.getElementById('empty-preview');
+
+		confidence.addEventListener('input', () => {
+			confidenceValue.textContent = Number(confidence.value).toFixed(2);
+		});
+
+		form.addEventListener('reset', () => {
+			setTimeout(() => {
+				confidenceValue.textContent = Number(confidence.value).toFixed(2);
+				errorBox.style.display = 'none';
+				result.style.display = 'none';
+				detections.innerHTML = '';
+				outputImage.style.display = 'none';
+				emptyPreview.style.display = 'grid';
+			}, 0);
+		});
+
+		form.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			errorBox.style.display = 'none';
+			errorBox.textContent = '';
+
+			const formData = new FormData(form);
+
+			try {
+				const response = await fetch('/analyze', {
+					method: 'POST',
+					body: formData,
+				});
+
+				const data = await response.json();
+				if (!response.ok) {
+					throw new Error(data.error || 'Analysis failed.');
+				}
+
+				modelBadge.textContent = `Model used: ${data.model}`;
+				reason.textContent = data.reason;
+				count.textContent = String(data.count);
+				conf.textContent = Number(confidence.value).toFixed(2);
+
+				detections.innerHTML = data.detections.length
+					? data.detections.map((item) => `
+							<div class="detection">
+								<span>${item.label}</span>
+								<span>${(item.confidence * 100).toFixed(1)}%</span>
+							</div>
+						`).join('')
+					: '<div class="detection"><span>No objects detected</span><span>Try a lower confidence threshold</span></div>';
+
+				outputImage.src = `data:image/png;base64,${data.image}`;
+				outputImage.style.display = 'block';
+				emptyPreview.style.display = 'none';
+				result.style.display = 'grid';
+			} catch (error) {
+				errorBox.textContent = error.message;
+				errorBox.style.display = 'block';
+			}
+		});
+	</script>
+</body>
+</html>
