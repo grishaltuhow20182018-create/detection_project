@@ -1,5 +1,5 @@
 # Dual Model Detection App
-
+web app :: https://detectionproject-k9zbbtedkgxeyw4ynzzdzz.streamlit.app/
 This project is a Streamlit computer vision web app that serves two local Ultralytics YOLO models:
 
 - `fast_model.pt` for quick results on clear, simple images
