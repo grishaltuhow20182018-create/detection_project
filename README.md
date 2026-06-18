@@ -1,6 +1,6 @@
 # Dual Model Detection App
 
-This project is a small computer vision web app that serves two local Ultralytics YOLO models:
+This project is a Streamlit computer vision web app that serves two local Ultralytics YOLO models:
 
 - `fast_model.pt` for quick results on clear, simple images
 - `thinking_model.pt` for harder cases, blurry images, or when maximum accuracy is requested
@@ -14,22 +14,21 @@ The app automatically chooses the better model based on the user's request and i
 
 ## Features
 
-- Web upload interface with a modern UI
+- Web upload interface with a modern UI built in Streamlit
 - Automatic model selection based on request text and image difficulty
-- JSON API for image analysis
 - Annotated prediction output rendered in the browser
 
 ## Project Structure
 
-- `app.py` - Flask backend and model selection logic
-- `index.html` - Frontend upload page and results view
+- `app.py` - Streamlit app and model selection logic
+- `index.html` - Legacy frontend file, no longer used for deployment
 - `fast_model.pt` - speed-focused model
 - `thinking_model.pt` - accuracy-focused model
 
 ## Requirements
 
 - Python 3.13+
-- Flask
+- Streamlit
 - Pillow
 - Ultralytics
 - OpenCV headless
@@ -37,22 +36,17 @@ The app automatically chooses the better model based on the user's request and i
 ## Run Locally
 
 ```bash
-python app.py
+streamlit run app.py
 ```
 
-Then open the app in your browser at `http://127.0.0.1:5000`.
+Then open the app in your browser at the local Streamlit URL shown in the terminal.
 
-## API
+## Streamlit Cloud Deployment
 
-### `POST /analyze`
-
-Form fields:
-
-- `image` - image file upload
-- `request_text` - short text describing what kind of processing is needed
-- `confidence` - optional confidence threshold
-
-Response includes the selected model, the reason it was chosen, detections, and a base64 annotated image.
+1. Push this repo to GitHub.
+2. Open Streamlit Community Cloud and create a new app from this repository.
+3. Set the main file path to `app.py`.
+4. Deploy.
 
 ## Notes
 
